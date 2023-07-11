@@ -1,0 +1,234 @@
+===========================================================================================
+
+# Section 4: Video 25
+
+SELECT SUBSTRING(email, FROM POSITION('@', email) + 1) AS email_domain, COUNT(email_domain),
+FROM employees
+GROUP BY email_domain 
+
+SELECT gender, region_id, MIN(salary) AS min_salary, MAX(salary) AS max_salary, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY gender, region_id
+ORDER BY gender, region_id
+
+===========================================================================================
+
+# Section 5: Video 29
+
+SELECT *
+FROM employees
+WHERE department IN 
+(   
+    SELECT department
+    FROM departments
+    WHERE division = 'Electronics'
+    
+)
+
+SELECT *
+FROM employees
+WHERE salary > 130000 AND region_id IN
+(
+    SELECT region_id
+    FROM regions
+    WHERE country IN ('Asia', 'Canada')
+)
+
+SELECT first_name, department, MAX(salary) - salary AS how_much_less
+FROM employees
+WHERE region_id IN
+(
+    SELECT region_id
+    FROM regions
+    WHERE country IN ('Asia', 'Canada')
+)
+
+===========================================================================================
+
+# Section 5: Video 30
+
+SELECT *
+FROM employees
+WHERE department = ANY 
+(   
+    SELECT department
+    FROM departments
+    WHERE division = 'Kids'
+    
+)
+AND hire_date > ALL 
+(
+    SELECT hire_date 
+    FROM employees 
+    WHERE department = 'Maintenance'
+)
+
+SELECT salary, COUNT(salary) AS count
+FROM employees
+GROUP BY salary
+ORDER BY count DESC, salary DESC
+LIMIT 1
+
+===========================================================================================
+
+# Section 5: Video 31
+
+SELECT name, MIN(id)
+FROM dupes
+GROUP BY name
+
+SELECT ROUND(AVG(salary))
+FROM employees
+WHERE salary NOT IN
+(
+    (SELECT MIN(salary) FROM employees),
+    (SELECT MAX(salary) FROM employees)
+)
+
+===========================================================================================
+
+# Section 6: Video 33
+
+SELECT category, COUNT(category) AS count
+FROM
+(
+    SELECT first_name, salary 
+        CASE
+            WHEN salary < 100 THEN 'Not Well Paid'
+            WHEN salary >= 100 AND salary < 160 THEN 'Well Paid'
+            ELSE 'Executive'
+        END AS category
+    FROM employees
+)
+ORDER BY count DESC
+
+===========================================================================================
+
+# Section 6: Video 34
+
+SELECT 
+SUM(CASE department = 'Sports' THEN 1 ELSE 0) as sports
+SUM(CASE department = 'Tools' THEN 1 ELSE 0) as tools
+SUM(CASE department = 'Clothing' THEN 1 ELSE 0) as clothing
+SUM(CASE department = 'Computers' THEN 1 ELSE 0) as computers
+FROM employees
+
+SELECT 
+COUNT(region_1) + COUNT(region_2) + COUNT(region_2) AS united_states,
+COUNTtemp_table.region_4) + COUNT(region_5) AS asia,
+COUNT(region_6) + COUNT(region_7) AS canada
+FROM 
+(
+    SELECT first_name, 
+    CASE WHEN region_id = 1 THEN (SELECT country FROM regions WHERE region_id = 1) ELSE NULL END AS region_1,
+    CASE WHEN region_id = 2 THEN (SELECT country FROM regions WHERE region_id = 2) ELSE NULL END AS region_2,
+    CASE WHEN region_id = 3 THEN (SELECT country FROM regions WHERE region_id = 3) ELSE NULL END AS region_3,
+    CASE WHEN region_id = 4 THEN (SELECT country FROM regions WHERE region_id = 4) ELSE NULL END AS region_4,
+    CASE WHEN region_id = 5 THEN (SELECT country FROM regions WHERE region_id = 5) ELSE NULL END AS region_5,
+    CASE WHEN region_id = 6 THEN (SELECT country FROM regions WHERE region_id = 6) ELSE NULL END AS region_6,
+    CASE WHEN region_id = 7 THEN (SELECT country FROM regions WHERE region_id = 7) ELSE NULL END AS region_7
+    FROM employees
+)
+
+===========================================================================================
+
+# Section 7: Video 36
+
+SELECT department
+FROM departments
+WHERE 38 < 
+    (
+        SELECT COUNT(*)
+        FROM employees
+        WHERE employees.department = departments.department
+    )
+
+SELECT department, 
+    (
+        SELECT MAX(salary) AS max_salary
+        FROM employees
+        WHERE employees.department = departments.department
+    )
+FROM departments
+WHERE 38 < 
+    (
+        SELECT COUNT(*)
+        FROM employees
+        WHERE employees.department = departments.department
+    )
+
+===========================================================================================
+
+# Section 7: Video 37
+
+SELECT department, first_name, salary, 
+    CASE 
+        WHEN salary = max_department_salary THEN 'HIGHEST SALARY'
+        WHEN salary = min_department_salary THEN 'LOWEST SALARY'
+    END AS salary_in_department
+FROM
+    (
+        SELECT department, first_name, salary, 
+            (
+                SELECT MAX(salary) 
+                FROM employees AS e2
+                WHERE e2.department = e1.department
+            ) AS max_department_salary, 
+            (
+                SELECT MIN(salary) 
+                FROM employees AS e2
+                WHERE e2.department = e1.department
+            ) AS min_department_salary, 
+        FROM employees AS e1
+    ) AS a
+WHERE salary = max_department_salary 
+OR salary = min_department_salary 
+ORDER BY department
+
+===========================================================================================
+
+# Section 8: Video 38
+
+SELECT first_name, email, division
+FROM employees, department
+WHERE employees.department = departments.department
+AND email IS NOT NULL
+
+SELECT country, COUNT(employee_id) employees_count
+FROM employees, region
+WHERE employees.region_id = region.region_id
+ORDER BY employees_count
+
+===========================================================================================
+
+# Section 8: Video 39
+
+SELECT DISTINCT employees.department
+FROM employees LEFT JOIN department
+ON employees.department = departments.department
+WHERE departments.department IS NULL
+
+===========================================================================================
+
+# Section 8: Video 40
+
+SELECT department, COUNT(*) AS employees_count
+FROM employees
+GROUP BY department
+UNION ALL
+SELECT 'TOTAL', COUNT(*) AS employees_count
+FROM employees
+
+===========================================================================================
+
+# Section 8: Video 42
+
+SELECT first_name, department, hire_date, country
+FROM employees AS e
+LEFT JOIN region AS r
+ON e.region_id = r.region_id
+WHERE hire_date = MIN(hire_date)
+OR hire_date = MAX(hire_date)
+ORDER BY hire_date
+
+===========================================================================================
